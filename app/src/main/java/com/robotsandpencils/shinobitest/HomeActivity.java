@@ -80,7 +80,7 @@ public class HomeActivity extends Activity {
 
     private void setupChart(ShinobiChart chart) {
 
-        mDomainAxis = new DomainAxis(DomainAxis.Domain.TIME, TimeZone.getDefault());
+        mDomainAxis = new DomainAxis(DomainAxis.Domain.TIME, true, TimeZone.getDefault());
 
         NumberAxis xAxis = new NumberAxis();
         final AxisStyle xAxisStyle = xAxis.getStyle();
@@ -140,7 +140,7 @@ public class HomeActivity extends Activity {
         mDomainAxis.allowPanningOutOfDefaultRange(true);
         mDomainAxis.allowPanningOutOfMaxRange(true);
         mDomainAxis.enableAnimation(true);
-        mDomainAxis.setExpectedLongestLabel(" ");
+        mDomainAxis.setExpectedLongestLabel("12:00");
         final AxisStyle style = mDomainAxis.getStyle();
         style.getGridlineStyle().setGridlinesShown(true);
         TickStyle domainTickStyle = style.getTickStyle();
@@ -148,16 +148,16 @@ public class HomeActivity extends Activity {
         domainTickStyle.setMinorTicksShown(true);
         domainTickStyle.setMajorTicksShown(true);
         domainTickStyle.setLabelTextSize(10.0f);
-        mDomainAxis.setMajorTickFrequency(30.0);
-        mDomainAxis.setMinorTickFrequency(5.0);
+        mDomainAxis.setMajorTickFrequency(10000.0);
+        mDomainAxis.setMinorTickFrequency(1000.0);
 
         //mDomainAxis.setMajorTickMarkValues(new ArrayList<Double>());
 
         mDomainAxis.setCurrentDisplayedRangePreservedOnUpdate(true);
 
-        xAxis.enableAnimation(true);
-        xAxis.enableGesturePanning(true);
-        xAxis.enableMomentumPanning(true);
+        xAxis.enableAnimation(false);
+        xAxis.enableGesturePanning(false);
+        xAxis.enableMomentumPanning(false);
         xAxis.setDefaultRange(new NumberRange(-1.2, 1.2));
 
         mAdapter = new DomainDataAdapter();
@@ -184,24 +184,14 @@ public class HomeActivity extends Activity {
 
             @Override
             protected Void doInBackground(Void... params) {
-
-                // Setting this date closer to the actual date fixes a resolution issue
-                // with the internal chart representation of the data. In this demo, setting the
-                // value to -200, causes a stair-stepping effect. But -100 does not have this effect.
-                // The lower this 'delta' becomes, the more closely the chart represents the values.
-                Calendar c = Calendar.getInstance();
-                c.add(Calendar.DATE, -200);
-
-                final Double startTime = DomainHelper.doubleFromDate(c.getTime());
-
                 while (!isCancelled()) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         break;
                     }
-                    final Double timeAsDouble = DomainHelper.doubleFromDate(new Date()) - startTime;
-                    mAdapter.add(new DataPoint<>(Math.sin(timeAsDouble / 10.0), -timeAsDouble));
+                    final Double timeAsDouble = DomainHelper.doubleFromDate(new Date());
+                    mAdapter.add(new DataPoint<>(Math.sin(timeAsDouble / 10000.0), timeAsDouble));
 
                     mChartView.post(new Runnable() {
                         @Override
@@ -210,7 +200,7 @@ public class HomeActivity extends Activity {
 
                             if (!hasSetRange) {
                                 hasSetRange = true;
-                                mDomainAxis.requestCurrentDisplayedRange(-timeAsDouble - 30, -timeAsDouble);
+                                mDomainAxis.requestCurrentDisplayedRange(timeAsDouble, timeAsDouble - 30000);
                             }
                         }
                     });

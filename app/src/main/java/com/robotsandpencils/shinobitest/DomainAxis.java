@@ -18,6 +18,7 @@ public class DomainAxis extends NumberAxis {
     private boolean mDisplayEnabled;
     private SimpleDateFormat mTimeFormat;
     private SimpleDateFormat mDateFormat;
+    private Double mAnchor;
 
     private final Domain mDomain;
 
@@ -59,5 +60,18 @@ public class DomainAxis extends NumberAxis {
         }
 
         return String.format("%s", dateString);
+    }
+
+    @Override
+    protected Double transformUserValueToChartValue(Double userValue) {
+        if (mAnchor == null) {
+            mAnchor = userValue;
+        }
+        return -(userValue - mAnchor);
+    }
+
+    @Override
+    protected Double transformChartValueToUserValue(Double chartValue) {
+        return -1 * (chartValue + mAnchor);
     }
 }

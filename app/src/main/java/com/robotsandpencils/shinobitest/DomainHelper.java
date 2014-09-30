@@ -7,17 +7,15 @@ import java.util.Date;
  */
 public class DomainHelper {
 
-    static double mDateScaleFactor = 1000.0;
-
     public static Date dateFromDouble(Double value) {
         if (value == null) return null;
-        long time = (long) (double) (value * mDateScaleFactor);
+        long time = (long) (double) (value);
         return new Date(time);
     }
 
     public static Double doubleFromDate(Date value) {
         long time = value.getTime();
-        return (double) time / mDateScaleFactor;
+        return (double) time;
     }
 
     public static Double doubleFromLong(Long value) {
